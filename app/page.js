@@ -1,6 +1,25 @@
+"use client"
+import { useEffect } from 'react';
 import Image from "next/image";
+import {useAuthState} from 'react-firebase-hooks/auth';
+import {auth} from './firebase/clientApp';
+import {signOut} from 'firebase/auth'
+import {useRouter} from 'next/navigation'
 
 export default function Home() {
+  const [user, loading] = useAuthState(auth);
+  const router = useRouter();
+
+  useEffect(() => {
+    if (!loading && !user) {
+      router.push('/sign-in');
+    }
+  }, [user, loading, router]);
+
+  if (loading || (!loading && !user)) {
+    return <div>Loading...</div>;
+  }
+
   return (
     <main className="flex min-h-screen flex-col items-center justify-between p-24">
       <div className="z-10 max-w-5xl w-full items-center justify-between font-mono text-sm lg:flex">
@@ -25,6 +44,7 @@ export default function Home() {
               priority
             />
           </a>
+          <button className="btn" onClick={() => signOut(auth)}>Sign Out</button>
         </div>
       </div>
 
